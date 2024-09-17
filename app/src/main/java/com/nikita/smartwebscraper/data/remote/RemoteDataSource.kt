@@ -2,31 +2,43 @@ package com.nikita.smartwebscraper.data.remote
 
 import com.nikita.smartwebscraper.data.model.PageStatus
 import com.nikita.smartwebscraper.data.model.SearchResult
-import org.jsoup.Jsoup
-import java.io.IOException
+import com.nikita.smartwebscraper.data.parser.HtmlParser
+import java.net.URL
 
-class RemoteDataSource {
+class RemoteDataSource(private val htmlParser: HtmlParser) {
 
     suspend fun search(url: String, searchText: String): SearchResult? {
         return try {
-            val doc = Jsoup.connect(url).get()
-            val matches = doc.text().split(searchText).size - 1
-            if (matches > 0) {
-                SearchResult(title = doc.title(), url = url, status = PageStatus.FOUND, matches = matches)
+            val html = downloadHtml(url)
+            if (html != null && htmlParser.containsText(html, searchText)) {
+                val matches = htmlParser.countMatches(html, searchText) // Підраховуємо кількість збігів у видимому тексті
+                SearchResult(title = url, url = url, status = PageStatus.FOUND, matches = matches)
             } else {
                 null
             }
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             null
         }
     }
 
     suspend fun extractLinks(url: String): List<String> {
         return try {
-            val doc = Jsoup.connect(url).get()
-            doc.select("a[href]").map { it.attr("abs:href") }
-        } catch (e: IOException) {
+            val html = downloadHtml(url)
+            if (html != null) {
+                htmlParser.extractLinks(html)
+            } else {
+                emptyList()
+            }
+        } catch (e: Exception) {
             emptyList()
+        }
+    }
+
+    private suspend fun downloadHtml(url: String): String? {
+        return try {
+            URL(url).readText()
+        } catch (e: Exception) {
+            null
         }
     }
 }

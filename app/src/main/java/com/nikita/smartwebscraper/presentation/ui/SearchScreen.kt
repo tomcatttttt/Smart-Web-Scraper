@@ -1,6 +1,9 @@
 package com.nikita.smartwebscraper.presentation.ui
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -8,6 +11,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.nikita.smartwebscraper.data.model.PageStatus
@@ -33,7 +37,7 @@ fun SearchScreen(viewModel: SearchViewModel) {
                     value = url,
                     onValueChange = { url = it },
                     label = { Text("Start URL") },
-                    singleLine = true, // Однорядкове поле
+                    singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
             }
@@ -94,6 +98,8 @@ fun SearchScreen(viewModel: SearchViewModel) {
             item {
                 LinearProgressIndicator(progress = progress / 100f, modifier = Modifier.fillMaxWidth().padding(top = 16.dp))
             }
+
+            // Показуємо результати пошуку
             items(searchResults) { result ->
                 SearchResultRow(result)
             }
@@ -111,11 +117,17 @@ fun SearchResultRow(result: SearchResult) {
         PageStatus.ERROR -> Color.Red
     }
 
+    val context = LocalContext.current
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .background(backgroundColor)
             .padding(8.dp)
+            .clickable {
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(result.url))
+                context.startActivity(intent)
+            }
     ) {
         Text(
             text = result.title,

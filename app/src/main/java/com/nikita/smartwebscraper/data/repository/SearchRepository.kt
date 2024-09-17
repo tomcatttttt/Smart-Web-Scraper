@@ -9,4 +9,7 @@ interface SearchRepository {
     fun pauseSearch()
     fun stopSearch()
     fun resumeSearch()
+
+    // Додай цей метод для відстеження загальної кількості URL
+    fun getTotalUrls(): Int
 }

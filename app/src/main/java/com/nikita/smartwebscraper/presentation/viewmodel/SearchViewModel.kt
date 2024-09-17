@@ -21,10 +21,14 @@ class SearchViewModel(private val fetchSearchResultsUseCase: FetchSearchResultsU
         viewModelScope.launch {
             fetchSearchResultsUseCase(query, url, maxUrls)
                 .catch { e ->
+                    println("Помилка під час пошуку: ${e.message}")
                 }
                 .collect { results ->
                     _searchResults.value = results
-                    _progress.value = (_searchResults.value.size * 100) / maxUrls
+                    val totalUrls = fetchSearchResultsUseCase.getTotalUrls()
+                    if (totalUrls > 0) {
+                        _progress.value = (_searchResults.value.size * 100) / totalUrls
+                    }
                 }
         }
     }

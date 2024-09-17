@@ -66,9 +66,6 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
 
-    // Jsoup for HTML parsing
-    implementation("org.jsoup:jsoup:1.15.3")
-
     // Kotlin Coroutines (optional if you'll be using them for asynchronous operations)
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
 
